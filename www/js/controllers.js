@@ -2,7 +2,9 @@
 'use strict';
 
 angular.module('starter.controllers', [])
-
+.constant('ApiEndpoint', {
+        url: 'http://128.199.101.93:3000/'
+})
 .controller('AppCtrl', function($scope, $ionicModal, $ionicPopover, $timeout) {
     // Form data for the login modal
     $scope.loginData = {};
@@ -87,92 +89,52 @@ angular.module('starter.controllers', [])
     };
 })
 
-.controller('LoginCtrl', function($scope, $timeout, $stateParams, ionicMaterialInk) {
-    $scope.$parent.clearFabs();
-    $timeout(function() {
-        $scope.$parent.hideHeader();
-    }, 0);
-    ionicMaterialInk.displayEffect();
-})
 
-.controller('FriendsCtrl', function($scope, $stateParams, $timeout, ionicMaterialInk, ionicMaterialMotion) {
-    // Set Header
-    $scope.$parent.showHeader();
-    $scope.$parent.clearFabs();
-    $scope.$parent.setHeaderFab('left');
+.controller('GalleryCtrl', function($scope, $stateParams, $timeout, ionicMaterialInk, ionicMaterialMotion,VideoService) {
 
-    // Delay expansion
-    $timeout(function() {
-        $scope.isExpanded = true;
-        $scope.$parent.setExpanded(true);
-    }, 300);
 
-    // Set Motion
-    ionicMaterialMotion.fadeSlideInRight();
+        setTimeout(function () {
+            VideoService.getAllVideoByCategoryFirstTime("55d1bb6bf29fb19d048e8075").then(
+                function (response) {
+                    $scope.videos = response.data;
+                    $scope.$parent.showHeader();
+                    $scope.$parent.clearFabs();
+                    $scope.isExpanded = true;
+                    $scope.$parent.setExpanded(true);
+                    $scope.$parent.setHeaderFab(false);
 
-    // Set Ink
-    ionicMaterialInk.displayEffect();
-})
+                    // Activate ink for controller
+                    ionicMaterialInk.displayEffect();
 
-.controller('ProfileCtrl', function($scope, $stateParams, $timeout, ionicMaterialMotion, ionicMaterialInk) {
-    // Set Header
-    $scope.$parent.showHeader();
-    $scope.$parent.clearFabs();
-    $scope.isExpanded = false;
-    $scope.$parent.setExpanded(false);
-    $scope.$parent.setHeaderFab(false);
-
-    // Set Motion
-    $timeout(function() {
-        ionicMaterialMotion.slideUp({
-            selector: '.slide-up'
-        });
-    }, 300);
-
-    $timeout(function() {
-        ionicMaterialMotion.fadeSlideInRight({
-            startVelocity: 3000
-        });
-    }, 700);
-
-    // Set Ink
-    ionicMaterialInk.displayEffect();
-})
-
-.controller('ActivityCtrl', function($scope, $stateParams, $timeout, ionicMaterialMotion, ionicMaterialInk) {
-    $scope.$parent.showHeader();
-    $scope.$parent.clearFabs();
-    $scope.isExpanded = true;
-    $scope.$parent.setExpanded(true);
-    $scope.$parent.setHeaderFab('right');
-
-    $timeout(function() {
-        ionicMaterialMotion.fadeSlideIn({
-            selector: '.animate-fade-slide-in .item'
-        });
-    }, 200);
-
-    // Activate ink for controller
-    ionicMaterialInk.displayEffect();
-})
-
-.controller('GalleryCtrl', function($scope, $stateParams, $timeout, ionicMaterialInk, ionicMaterialMotion) {
-    $scope.$parent.showHeader();
-    $scope.$parent.clearFabs();
-    $scope.isExpanded = true;
-    $scope.$parent.setExpanded(true);
-    $scope.$parent.setHeaderFab(false);
-
-    // Activate ink for controller
-    ionicMaterialInk.displayEffect();
-
-    ionicMaterialMotion.pushDown({
-        selector: '.push-down'
-    });
-    ionicMaterialMotion.fadeSlideInRight({
-        selector: '.animate-fade-slide-in .item'
-    });
+                    ionicMaterialMotion.pushDown({
+                        selector: '.push-down'
+                    });
+                    ionicMaterialMotion.fadeSlideInRight({
+                        selector: '.animate-fade-slide-in .item'
+                    });
+                }, function (data) {
+                    alert("Server Error !!! Can not get video first time");
+                });
+        }, 1000);
 
 })
+.service('VideoService',['$http','$log','ApiEndpoint',function ($http,$log,ApiEndpoint){
+        this.getAllVideoByCategoryFirstTime = function (categoryID) {
 
-;
+            var requestVideo = {};
+            requestVideo.categoryID = categoryID;
+            requestVideo.skip = 0;
+            console.log(requestVideo);
+            var promise = $http({
+                method: 'POST',
+                url: ApiEndpoint.url+'getAllVideoFirstTime',
+                data: requestVideo
+            }).success(function (data) {
+
+            }).error(function (data, status, headers, config) {
+                //  $log.log(data);
+                alert("?ã x?y ra l?i k?t n?i v?i máy ch?")
+            });
+            return promise;
+        }
+}]);
