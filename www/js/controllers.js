@@ -3,7 +3,7 @@
 
 angular.module('starter.controllers', [])
 .constant('ApiEndpoint', {
-        url: 'http://128.199.101.93:3000/'
+        url: 'http://10.12.1.12:5000/'
 })
 .controller('AppCtrl', function($scope, $ionicModal, $ionicPopover, $timeout) {
     // Form data for the login modal
@@ -90,41 +90,105 @@ angular.module('starter.controllers', [])
 })
 
 
-.controller('GalleryCtrl', function($scope, $stateParams, $timeout, ionicMaterialInk, ionicMaterialMotion,VideoService) {
+.controller('GalleryCtrl', function($scope, $stateParams, $timeout, ionicMaterialInk, ionicMaterialMotion,VideoService,localStorageService,$ionicLoading) {
+        var skip = localStorageService.get("skip");
+        var videos = localStorageService.get("videos");
+        var total = localStorageService.get("total");
 
-
-        setTimeout(function () {
-            VideoService.getAllVideoByCategoryFirstTime("55d1bb6bf29fb19d048e8075").then(
-                function (response) {
-                    $scope.videos = response.data;
-                    $scope.$parent.showHeader();
-                    $scope.$parent.clearFabs();
-                    $scope.isExpanded = true;
-                    $scope.$parent.setExpanded(true);
-                    $scope.$parent.setHeaderFab(false);
-
-                    // Activate ink for controller
-                    ionicMaterialInk.displayEffect();
-
-                    ionicMaterialMotion.pushDown({
-                        selector: '.push-down'
-                    });
-                    ionicMaterialMotion.fadeSlideInRight({
-                        selector: '.animate-fade-slide-in .item'
-                    });
-                }, function (data) {
-                    alert("Server Error !!! Can not get video first time");
+        if (skip == null ) {
+            skip = 0;
+            videos = [];
+            total = 0;
+            setTimeout(function () {
+                $ionicLoading.show({
+                    content: '<i class="icon ion-loading-c"></i>',
+                    animation: 'fade-in',
+                    showBackdrop: false,
+                    maxWidth: 50,
+                    showDelay: 1000
                 });
-        }, 1000);
+                VideoService.getAllVideoByCategoryFirstTime(skip).then(
+                    function (response) {
+                        var videoResponse = response.data;
+                        var totalResponse;
+                        for (var x in videoResponse) {
+                            videos.push(videoResponse[x]);
+                            totalResponse = videoResponse[x].total;
+                        }
+                        var newskip = localStorageService.get("skip") + 5;
+                        localStorageService.set("skip",newskip);
+                        localStorageService.set("videos",videos);
+                        localStorageService.set("total",totalResponse);
+                        $scope.videos = videos;
+                        $scope.$parent.showHeader();
+                        $scope.$parent.clearFabs();
+                        $scope.isExpanded = true;
+                        $scope.$parent.setExpanded(true);
+                        $scope.$parent.setHeaderFab(false);
+                        // Activate ink for controller
+                        ionicMaterialInk.displayEffect();
+                        ionicMaterialMotion.pushDown({
+                            selector: '.push-down'
+                        });
+                        ionicMaterialMotion.fadeSlideInRight({
+                            selector: '.animate-fade-slide-in .item'
+                        });
+                        $ionicLoading.hide();
+                    }, function (data) {
+                        $ionicLoading.hide();
+                        alert("Server Error !!! Can not get video first time");
+                    });
+            }, 1000);
+        }
+
+
+
+        $scope.loadMoreVideo = function () {
+            $ionicLoading.show({
+                content: '<i class="icon ion-loading-c"></i>',
+                animation: 'fade-in',
+                showBackdrop: false,
+                maxWidth: 50,
+                showDelay: 1000
+            });
+            var skip = localStorageService.get("skip");
+            setTimeout(function () {
+                VideoService.getAllVideoByCategory(skip).then(
+                    function (response) {
+                        var videoResponse = response.data;
+                        for (var x in videoResponse) {
+                            videos.push(videoResponse[x]);
+                        }
+                        var newskip = localStorageService.get("skip") + 5;
+                        localStorageService.set("skip",newskip);
+                        localStorageService.set("videos",videos);
+                        $scope.videos = videos;
+                        $scope.$broadcast('scroll.infiniteScrollComplete');
+                        $ionicLoading.hide();
+                    }, function (data) {
+                        alert("Da xay ra ket noi voi may chu");
+                        $ionicLoading.hide();
+                    });
+            }, 1000);
+        };
+
+        $scope.canWeLoadMoreVideo = function () {
+              if(skip == 0) {
+                  return true;
+              } else {
+                  return (videos.length < total) ? true : false;
+              }
+        }
+
+        $scope.playVideo = function (url) {
+            YoutubeVideoPlayer.openVideo(url);
+        }
 
 })
 .service('VideoService',['$http','$log','ApiEndpoint',function ($http,$log,ApiEndpoint){
-        this.getAllVideoByCategoryFirstTime = function (categoryID) {
-
+        this.getAllVideoByCategoryFirstTime = function (skip) {
             var requestVideo = {};
-            requestVideo.categoryID = categoryID;
-            requestVideo.skip = 0;
-            console.log(requestVideo);
+            requestVideo.skip = skip;
             var promise = $http({
                 method: 'POST',
                 url: ApiEndpoint.url+'getAllVideoFirstTime',
@@ -133,8 +197,27 @@ angular.module('starter.controllers', [])
 
             }).error(function (data, status, headers, config) {
                 //  $log.log(data);
-                alert("?ã x?y ra l?i k?t n?i v?i máy ch?")
+                alert("Da xay ra ket noi voi may chu")
             });
             return promise;
         }
+
+        this.getAllVideoByCategory = function (skip) {
+            var requestVideo = {};
+            requestVideo.skip = skip;
+
+            var promise = $http({
+                method: 'POST',
+                url: ApiEndpoint.url+'getAllVideoByCategory',
+                data: requestVideo
+            }).success(function (data) {
+
+            }).error(function (data, status, headers, config) {
+                $log.log(data);
+                alert("loi")
+            });
+            return promise;
+        }
+
+
 }]);

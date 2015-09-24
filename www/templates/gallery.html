@@ -1,24 +1,40 @@
 <ion-view view-title="Gallery">
     <ion-content ng-class="{expanded:isExpanded}" class="animate-fade-slide-in">
         <div class="list half"  collection-repeat="video in videos"   >
-            <div ui-sref="app.profile"class="card card-gallery item item-text-wrap">
-                <div class="ink dark-bg">
-                    <h2>Where's Elsa?</h2>
-                    <img class="full-image" src="img/sansa-snowcastle3.jpg">
-                </div>
-                <div class="item tabs tabs-secondary tabs-icon-left">
-                    <a class="tab-item stable-bg assertive">
-                        <i class="icon ion-heart"></i>
-                        4
-                    </a>
-                    <a class="tab-item stable-bg positive-900">
-                        <i class="icon ion-chatbubbles"></i>
-                        2
-                    </a>
-                </div>
+            <div class="item item-avatar">
+                <img ng-src="http:{{video.image}}">
+                <h2>{{video.name}}</h2>
+
+            </div>
+
+            <div class="item item-body">
+                <img class="full-image" ng-src="http:{{video.image}}"  ng-click="playVideo(video.url)">
+
+            </div>
+
+            <div class="item tabs tabs-secondary tabs-icon-left">
+                <a class="tab-item" ng-click="playVideo(video.url)">
+                    <i class="icon ion-social-youtube-outline"></i>
+                    Xem
+                </a>
+                <a class="tab-item" ng-click="insertVideo(video.id,video.name,video.url,video.image)">
+                    <i class="icon ion-star"></i>
+                    Yêu thích
+                </a>
+                <a class="tab-item" ng-click="shareVideoToFacebook('Demo message', 'www/img/image1.jpeg', 'https://play.google.com/store/apps/details?id=com.nguyenle.gotoagilevn')">
+                    <i class="icon ion-share" ></i>
+                    Chia s?
+                </a>
             </div>
 
         </div>
+
+        <ion-infinite-scroll
+                ng-if="canWeLoadMoreVideo()"
+                on-infinite="loadMoreVideo()"
+                icon="ion-loading-c"
+                distance="1%">
+        </ion-infinite-scroll>
 
     </ion-content>
 </ion-view>

@@ -4,8 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers', 'ionic-material', 'ionMdInput'])
-
+angular.module('starter', ['ionic', 'starter.controllers', 'ionic-material', 'ionMdInput','LocalStorageModule'])
 .run(function($ionicPlatform) {
     $ionicPlatform.ready(function() {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -20,8 +19,12 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ionic-material', 'io
     });
 })
 
-.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider,localStorageServiceProvider) {
 
+    localStorageServiceProvider
+            .setPrefix('haituctieu')
+            .setStorageType('sessionStorage')
+            .setNotify(true, true)
     // Turn off caching for demo simplicity's sake
     $ionicConfigProvider.views.maxCache(0);
 
@@ -75,6 +78,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ionic-material', 'io
 
     .state('app.gallery', {
         url: '/gallery',
+        cache : false,
         views: {
             'menuContent': {
                 templateUrl: 'templates/gallery.html',
