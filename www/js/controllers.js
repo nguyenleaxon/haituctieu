@@ -3,7 +3,7 @@
 
 angular.module('starter.controllers', [])
 .constant('ApiEndpoint', {
-        url: 'http://10.12.1.12:5000/'
+        url: 'http://10.11.5.162:5000/'
 })
 .controller('AppCtrl', function($scope, $ionicModal, $ionicPopover, $timeout) {
     // Form data for the login modal
