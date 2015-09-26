@@ -90,7 +90,7 @@ angular.module('starter.controllers', [])
 })
 
 
-.controller('GalleryCtrl', function($scope, $stateParams, $timeout, ionicMaterialInk, ionicMaterialMotion,VideoService,localStorageService,$ionicLoading) {
+.controller('GalleryCtrl', function($scope, $stateParams, $timeout, ionicMaterialInk, ionicMaterialMotion,VideoService,localStorageService,$ionicLoading,$cordovaSocialSharing) {
         var skip = localStorageService.get("skip");
         var videos = localStorageService.get("videos");
         var total = localStorageService.get("total");
@@ -185,6 +185,24 @@ angular.module('starter.controllers', [])
 
         $scope.playVideo = function (url) {
             YoutubeVideoPlayer.openVideo(url);
+        }
+
+        $scope.shareVideoToFacebook = function(message,image,link) {
+            $scope.loading = $ionicLoading.show({
+                content: '<i class="icon ion-loading-c"></i>',
+                animation: 'fade-in',
+                showBackdrop: false,
+                maxWidth: 50,
+                showDelay: 1000
+            });
+            setTimeout(function () {
+                $cordovaSocialSharing.shareViaFacebook(message,null,link)
+                    .then(function(result) {
+                        $ionicLoading.hide();
+                    }, function(err) {
+                        $ionicLoading.hide();
+                    });
+            }, 1000);
         }
 
 })
