@@ -3,7 +3,7 @@
 
 angular.module('starter.controllers', [])
 .constant('ApiEndpoint', {
-        url: 'http://10.11.5.162:5000/'
+        url: 'http://192.168.1.5:5000/'
 })
 .controller('AppCtrl', function($scope, $ionicModal, $ionicPopover, $timeout) {
     // Form data for the login modal
@@ -151,8 +151,9 @@ angular.module('starter.controllers', [])
                 maxWidth: 50,
                 showDelay: 1000
             });
-            var skip = localStorageService.get("skip");
+
             setTimeout(function () {
+                var skip = localStorageService.get("skip");
                 VideoService.getAllVideoByCategory(skip).then(
                     function (response) {
                         var videoResponse = response.data;
@@ -173,9 +174,11 @@ angular.module('starter.controllers', [])
         };
 
         $scope.canWeLoadMoreVideo = function () {
-              if(skip == 0) {
+            var skip = localStorageService.get("skip");
+              if(skip == 0 || skip == null) {
                   return true;
               } else {
+                  var total = localStorageService.get("total");
                   return (videos.length < total) ? true : false;
               }
         }
