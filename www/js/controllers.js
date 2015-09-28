@@ -3,7 +3,7 @@
 
 angular.module('starter.controllers', [])
 .constant('ApiEndpoint', {
-        url: 'http://192.168.1.5:5000/'
+        url: 'http://10.12.1.12:5000/'
 })
 .controller('AppCtrl', function($scope, $ionicModal, $ionicPopover, $timeout) {
     // Form data for the login modal
@@ -205,7 +205,41 @@ angular.module('starter.controllers', [])
             }, 1000);
         }
 
-})
+}).controller("LoginController",function($scope, $stateParams,$cordovaOauth,$timeout,localStorageService,$ionicLoading){
+        localStorageService.remove("skip","videos","total");
+
+        $scope.login = function() {
+            $cordovaOauth.facebook("1698134653751611", ["nguyenleaxon@gmail.com"]).then(function(result) {
+                localStorageService.accessToken = result.access_token;
+              //  $location.path("/profile");
+            }, function(error) {
+                alert("There was a problem signing in!  See the console for logs");
+                console.log(error);
+            });
+        }
+    })
+    .controller("FeedbackController",function($scope,$state,$cordovaEmailComposer){
+        cordova.plugins.email.addAlias('gmail', 'com.google.android.gm');
+        $scope.subject = "";
+        $scope.body = ""
+
+        $scope.sendEmail = function(subject,body) {
+            var email = {
+                app: 'gmail',
+                to: 'nguyenleaxon@gmail.com',
+                subject: subject,
+                body: body,
+                isHtml: true
+            };
+            $cordovaEmailComposer.open(email).then(null, function () {
+                $scope.subject = "";
+                $scope.body = ""
+
+
+            });
+        }
+
+    })
 .service('VideoService',['$http','$log','ApiEndpoint',function ($http,$log,ApiEndpoint){
         this.getAllVideoByCategoryFirstTime = function (skip) {
             var requestVideo = {};

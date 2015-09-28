@@ -1,0 +1,27 @@
+<ion-view view-title="Phản Hồi" >
+    <ion-content  overflow-scroll="true" ng-controller="FeedbackController">
+
+        <div class="row responsive-sm padding-top">
+            <br>
+            <div> <span style="text-align: center"> <h1> Phản Hồi </h1> </span> </div>
+            <span style="text-align: center" >Cảm ơn bạn đã sử dụng sản phẩm này.Chúng tôi rất muốn được nghe phản hồi của bạn về ứng dụng này </span>
+            <div class="col">
+                <div class="list">
+                    <label class="item item-input">
+                        <input type="text" ng-model="subject" placeholder="Chủ Đề">
+                    </label>
+                    <label class="item item-input">
+                        <textarea rows="5" ng-model="body" placeholder="Nội Dung"></textarea>
+                    </label>
+                </div>
+                <button class="button button-full button-positive"  ng-click="sendEmail(subject,body)">
+                    Click Gửi Email
+                </button>
+            </div>
+            <div class="col" style="text-align: center">
+                <div> Nhóm Phát Triển : GotoAgileVN Company </div>
+                <div> Version 1.0.0 - Copy Right@2015</div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>
